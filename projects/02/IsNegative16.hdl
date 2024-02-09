@@ -1,0 +1,18 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/IsNegative16.hdl
+
+/**
+ * Checks if 16-bit value is negative.
+ * out = 1 if (in < 0)
+ *		 0 otherwise
+ */
+
+ CHIP IsNegative16 {
+	IN in[16];
+	OUT out;
+
+	PARTS:
+	Or(a=in[15], b=false, out=out);
+ }
