@@ -26,7 +26,6 @@
  */
 
 CHIP CPU {
-
     IN  inM[16],         // M value input  (M = contents of RAM[A])
         instruction[16], // Instruction for execution
         reset;           // Signals whether to re-start the current
@@ -39,5 +38,54 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+
+	// Instruction pins
+	Thru(in=instruction[0], out=j3);
+	Thru(in=instruction[1], out=j2);
+	Thru(in=instruction[2], out=j1);
+	Thru(in=instruction[3], out=d3);
+	Thru(in=instruction[4], out=d2);
+	Thru(in=instruction[5], out=d1);
+	Thru(in=instruction[6], out=c6);
+	Thru(in=instruction[7], out=c5);
+	Thru(in=instruction[8], out=c4);
+	Thru(in=instruction[9], out=c3);
+	Thru(in=instruction[10], out=c2);
+	Thru(in=instruction[11], out=c1);
+	Thru(in=instruction[12], out=a);
+	Thru(in=instruction[15], out=cinstr);
+	Not(in=cinstr, out=ainstr0, out=ainstr1);
+
+	// Decide if it's an A instruction or a C instruction
+	Mux16(a=outM0, b=instruction, sel=ainstr1, out=intoA);
+
+	// A Register
+	Or(a=d1, b=ainstr0, out=loadA); // Load A if it's an A instruction or if d1 bit is set
+	ARegister(in=intoA, load=loadA, out=A0, out=A1, out[0..14]=addressM);
+	
+	// D register
+	And(a=d2, b=cinstr, out=loadD); // Load D if it's a C instruction and d2 bit is set
+	DRegister(in=outM1, load=loadD, out=D);
+	
+	// Decide whether to use A or M using the a bit
+	Mux16(a=A0, b=inM, sel=a, out=AM);
+
+	// Load M if it's a C instruction and d3 is set
+	And(a=cinstr, b=d3, out=writeM);
+
+	// ALU
+	ALU(x=D, y=AM, zx=c1, nx=c2, zy=c3, ny=c4, f=c5, no=c6, out=outM, out=outM0, out=outM1, zr=zr, ng=ng);
+
+	// Jump logic
+	Not(in=ng, out=notng);
+	Not(in=zr, out=notzr);
+	And(a=notng, b=notzr, out=gt);
+	Or(a=notng, b=zr, out=ge);
+	And(a=ng, b=notzr, out=lt);
+	Or(a=ng, b=zr, out=le);
+	Mux8Way(a=false, b=gt, c=zr, d=ge, e=lt, f=notzr, g=le, h=true, sel[0]=j3, sel[1]=j2, sel[2]=j1, out=jmp);
+
+	// Program counter
+	And(a=jmp, b=cinstr, out=loadPC); // Jump if a C instruction and the jmp pin is asserted
+	PC(in=A1, load=loadPC, inc=true, reset=reset, out[0..14]=pc);
 }
