@@ -3,7 +3,9 @@
   :build-pathname "assembler"
   :entry-point "assembler:main"
   :serial t
+  :depends-on ("str")
   :components ((:file "package")
                (:file "main")
                (:file "parser")
+               (:file "symbol")
                (:file "code")))

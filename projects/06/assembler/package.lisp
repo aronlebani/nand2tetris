@@ -8,4 +8,7 @@
   (:use :cl)
   (:import-from :sb-ext
                 :*posix-argv*)
+  (:import-from :str
+                :replace-all
+                :rsplit)
   (:export :main))

@@ -50,14 +50,13 @@
     ("D|A" . "010101")
     ("D|M" . "010101")))
 
-(defun dest-code (mnemonic)
-  (cdr (assoc mnemonic *dest-codes* :test 'equal)))
+(defmacro defencoder (name &key lookup-table)
+  `(defun ,name (mnemonic)
+     (cdr (assoc mnemonic ,lookup-table :test 'equal))))
 
-(defun jump-code (mnemonic)
-  (cdr (assoc mnemonic *jump-codes* :test 'equal)))
-
-(defun comp-code (mnemonic)
-  (cdr (assoc mnemonic *comp-codes* :test 'equal)))
+(defencoder dest-code :lookup-table *dest-codes*)
+(defencoder jump-code :lookup-table *jump-codes*)
+(defencoder comp-code :lookup-table *comp-codes*)
 
 (defun address-code (mnemonic)
   (if (find #\M mnemonic)
