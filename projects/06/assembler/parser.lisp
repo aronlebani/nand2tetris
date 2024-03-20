@@ -45,15 +45,16 @@
         "null")))
 
 (defun parse-a-command (command)
-  (let ((s (extract-symbol command)))
+  (let ((s (extract-symbol command))
+        (encode (lambda (x) (format nil "0~15,'0b" x))))
     (if (parse-integer s :junk-allowed t)
-        (format nil "0~15,'0b" (parse-integer (extract-symbol command)))
+        (encode (parse-integer (extract-symbol command)))
         (if (cdr (assoc s *symbol-table* :test 'equal))
-            (format nil "0~15,'0b" (cdr (assoc s *symbol-table* :test 'equal)))
+            (encode (cdr (assoc s *symbol-table* :test 'equal)))
             (progn
               (push (cons s *ram-counter*) *symbol-table*)
               (incf *ram-counter*)
-              (format nil "0~15,'0b" (1- *ram-counter*)))))))
+              (encode (1- *ram-counter*)))))))
 
 (defun parse-c-command (command)
   (format nil "111~a~a~a~a"
