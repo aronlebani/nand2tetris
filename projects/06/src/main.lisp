@@ -1,14 +1,10 @@
 (in-package :assembler)
 
-(defun get-dest (path)
-  (make-pathname
-    :directory (pathname-directory path)
-    :name (pathname-name path)
-    :type "hack"))
-
 (defun parse-commands (path)
   (with-open-file (in path)
-    (with-open-file (out (get-dest path)  :direction :output :if-exists :supersede)
+    (with-open-file (out (make-out-path path)
+                         :direction :output
+                         :if-exists :supersede)
       (when in
         (loop for line = (read-line in nil)
               while line

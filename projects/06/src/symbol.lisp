@@ -2,6 +2,8 @@
 
 (defparameter *pc* 0)
 
+(defparameter *ram-counter* 16)
+
 (defparameter *symbol-table*
   '(("SP" . 0)
     ("LCL" . 1)
@@ -27,10 +29,22 @@
     ("SCREEN" . 16384)
     ("KBD" . 16385)))
 
+(defun in-symbol-table? (sym)
+  (cdr (assoc sym *symbol-table* :test 'equal)))
+
+(defun add-to-symbol-table (sym)
+  (push (cons sym *ram-counter*) *symbol-table*)
+  (incf *ram-counter*)
+  (1- *ram-counter*))
+
+(defun get-from-symbol-table (sym)
+  (cdr (assoc sym *symbol-table* :test 'equal)))
+
 (defun parse-symbol (line)
   "Parses 'line' and adds an entry to the *symbol-table* if it is an L command.
    Increases the program counter for A and C commands."
   (let ((sanitized (sanitize-command line)))
     (cond ((empty? sanitized) nil)
           ((or (a-command? sanitized) (c-command? sanitized)) (incf *pc*))
-          ((l-command? sanitized) (push (cons (extract-symbol sanitized) *pc*) *symbol-table*)))))
+          ((l-command? sanitized) (push (cons (extract-symbol sanitized) *pc*)
+                                        *symbol-table*)))))

@@ -1,14 +1,5 @@
 (in-package :assembler)
 
-(defparameter *ram-counter* 16)
-
-(defmacro end (seq)
-  `(- (length ,seq) 1))
-
-(defmacro position-after (element seq)
-  `(when (position ,element ,seq)
-     (+ (position ,element ,seq) 1)))
-
 (defun a-command? (command)
   (char= (elt command 0) #\@))
 
@@ -21,6 +12,10 @@
 
 (defun empty? (command)
   (equal command ""))
+
+(defun const? (command)
+  (parse-integer (extract-symbol command)
+                 :junk-allowed t))
 
 (defun extract-symbol (command)
   (cond ((a-command? command) (subseq command 1))
@@ -45,16 +40,12 @@
         "null")))
 
 (defun parse-a-command (command)
-  (let ((s (extract-symbol command))
-        (encode (lambda (x) (format nil "0~15,'0b" x))))
-    (if (parse-integer s :junk-allowed t)
-        (encode (parse-integer (extract-symbol command)))
-        (if (cdr (assoc s *symbol-table* :test 'equal))
-            (encode (cdr (assoc s *symbol-table* :test 'equal)))
-            (progn
-              (push (cons s *ram-counter*) *symbol-table*)
-              (incf *ram-counter*)
-              (encode (1- *ram-counter*)))))))
+  (let ((sym (extract-symbol command)))
+    (if (const? command)
+        (const-code (parse-integer sym))
+        (if (in-symbol-table? sym)
+            (const-code (get-from-symbol-table sym)) 
+            (const-code (add-to-symbol-table sym))))))
 
 (defun parse-c-command (command)
   (format nil "111~a~a~a~a"

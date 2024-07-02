@@ -5,6 +5,7 @@
   :serial t
   :depends-on ("str")
   :components ((:file "package")
+               (:file "helpers")
                (:file "main")
                (:file "parser")
                (:file "symbol")

@@ -56,12 +56,14 @@
              (cdr (assoc mnemonic ,lookup-table :test 'equal)))) 
         (func
           `(defun ,name (mnemonic)
-             (apply ,func mnemonic)))))
+             (,func mnemonic)))))
 
 (defencoder dest-code :lookup-table *dest-codes*)
 (defencoder jump-code :lookup-table *jump-codes*)
 (defencoder comp-code :lookup-table *comp-codes*)
 (defencoder address-code :func (lambda (mnemonic)
-                                  (if (find #\M mnemonic)
-                                      "1"
-                                      "0")))
+                                 (if (find #\M mnemonic)
+                                     "1"
+                                     "0")))
+(defencoder const-code :func (lambda (const)
+                               (format nil "0~15,'0b" const)))
