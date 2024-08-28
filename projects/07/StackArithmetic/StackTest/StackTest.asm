@@ -555,7 +555,7 @@ M=M-1
 @SP
 A=M
 
-D=M+D
+D=D+M
 @SP
 A=M
 M=D
@@ -588,7 +588,7 @@ M=M-1
 @SP
 A=M
 
-D=M-D
+D=D-M
 @SP
 A=M
 M=D
@@ -659,7 +659,7 @@ M=M-1
 @SP
 A=M
 
-D=M|D
+D=D|M
 @SP
 A=M
 M=D
